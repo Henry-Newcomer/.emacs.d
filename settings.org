@@ -6,9 +6,6 @@
 # ****************************************************************************
 # ============================================================================
 
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
-
 * Startup
 ** Start timer
 
@@ -243,7 +240,6 @@ TODO: Decide whether to use a keybinding or the delay...
 
 #+BEGIN_SRC emacs-lisp
 (use-package company
-  :defer 8
   :config
 (add-hook 'after-init-hook 'global-company-mode)
 ;; Set keybindings
@@ -415,7 +411,9 @@ Repo: https://github.com/flycheck/flycheck
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :config
+  :ensure t
+  :init
+    (global-flycheck-mode)
     (add-hook 'after-init-hook #'global-flycheck-mode))
 #+END_SRC
 
@@ -503,6 +501,17 @@ Repo: https://github.com/sabof/org-bullets
         (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 )
     ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))))
+#+END_SRC
+
+** PHP Mode
+
+Repo: https://github.com/emacs-php/php-mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package php-mode
+  :defer t
+  :config
+    (require 'php-mode))
 #+END_SRC
 
 ** Rainbow Delimiters
@@ -595,11 +604,24 @@ Repo: https://github.com/dbordak/telephone-line
   :defer t
   :config
 (require 'undo-tree)
-
 (define-key evil-normal-state-map (kbd "u") 'undo)
 (define-key evil-normal-state-map (kbd "C-r") 'undo-tree-redo)
-(define-key <Leader> (kbd "C-r") 'undo-tree-visualize)
-)
+(define-key <Leader> (kbd "C-r") 'undo-tree-visualize))
+#+END_SRC
+
+** Web Mode
+Website: https://web-mode.org/
+
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode
+  :defer t
+  :config
+(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(require 'web-mode))
+
 #+END_SRC
 
 ** YAScroll
@@ -608,8 +630,7 @@ Repo: https://github.com/dbordak/telephone-line
 (use-package yascroll
   :defer 8
   :config
-(global-yascroll-bar-mode 1)
-)
+(global-yascroll-bar-mode 1))
 #+END_SRC
 
 ** TODO YASnippet
@@ -761,6 +782,32 @@ FIXME: Only grabs hl-line at the moment
     (if face (message "Font face: %s" face) (message "No font face at %d" pos))))
 
 (define-key <Leader> (kbd "f f") 'henry:face-over-point)
+    #+END_SRC
+
+** Hide ^M
+*** ...
+
+Source: https://stackoverflow.com/questions/730751/hiding-m-in-emacs
+#+BEGIN_SRC emacs-lisp
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
+(add-hook 'text-mode-hook 'remove-dos-eol)
+#+END_SRC
+
+*** Keywords (ex. "TODO")
+    Source: https://gist.github.com/nilsdeppe/7645c096d93b005458d97d6874a91ea9
+
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'prog-mode-hook
+      (lambda ()
+        ;; Disabled in cmake-mode due to glitch (see Author's comment in source)
+        (when (not (derived-mode-p 'cmake-mode))
+          (font-lock-add-keywords nil
+            '(("\\<\\(BUG\\|DONE\\|FIXME\\|NOTE\\|TEMP\\|TODO\\)"
+                1 font-lock-warning-face t))))))
     #+END_SRC
 
 ** Highlights
@@ -1071,8 +1118,8 @@ Repo: https://github.com/dbordak/telephone-line
 ** Theme (custom)
 
 #+BEGIN_SRC emacs-lisp
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-;; (load-theme 'laguna t)
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes") ;; for local testing
+;; (load-theme 'laguna t) ;; for local testing
 (use-package laguna-theme
   :init (progn (load-theme 'laguna t))
   :defer t
