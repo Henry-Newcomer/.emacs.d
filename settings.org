@@ -1668,6 +1668,21 @@ horizontally, respectively."
     #+END_SRC
 
 
+** For Work:
+*** Insert get_defined_vars()
+
+    #+BEGIN_SRC emacs-lisp
+      (defun henry:insert-get-defined-vars ()
+        "Inserts PHP code to spit out all accessible vars. Also kills the rest of the script."
+        (interactive)
+        (evil-insert-state)
+        (insert "\n echo <pre>\n print_r(get_defined_vars());\n exit('DEBUG');\n")
+        (evil-normal-state))
+
+      (define-key <Leader> (kbd "i v") 'henry:insert-get-defined-vars)
+    #+END_SR C
+
+
 * Manual package control
 ** TODO EAF - Emacs Application Framework
     Repo: https://github.com/emacs-eaf/emacs-application-framework
