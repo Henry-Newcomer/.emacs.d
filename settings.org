@@ -1680,7 +1680,7 @@ horizontally, respectively."
         (evil-normal-state))
 
       (define-key <Leader> (kbd "i v") 'henry:insert-get-defined-vars)
-    #+END_SR C
+    #+END_SRC
 
 
 * Manual package control
