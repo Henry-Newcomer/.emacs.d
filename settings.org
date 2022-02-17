@@ -93,6 +93,23 @@ Detects the current Operating System
 #+END_SRC
 
 
+** Straight.el
+
+#+BEGIN_SRC emacs-lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+#+END_SRC
+
 
 ** EVIL Mode
 
@@ -492,6 +509,19 @@ Repo: https://github.com/flycheck/flycheck-inline
       (global-flycheck-inline-mode))
 #+END_SRC
 
+** gdscript-mode
+
+Repo: https://github.com/godotengine/emacs-gdscript-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gdscript-mode
+    :straight
+      (gdscript-mode
+        :type git
+        :host github
+        :repo "godotengine/emacs-gdscript-mode"))
+#+END_SRC
+
 ** Magit
 
 Repo: https://github.com/magit/magit
@@ -740,16 +770,16 @@ Source: https://www.emacswiki.org/emacs/ForceBackups
 
     - Source: https://stackoverflow.com/questions/34087964/visual-studio-style-curly-brackets-auto-completion-in-emacs
     #+BEGIN_SRC emacs-lisp
-    (defun electric-pair-brace-fixup ()
-      (when (and electric-pair-mode
-              (if (functionp electric-pair-open-newline-between-pairs)
-                (funcall electric-pair-open-newline-between-pairs)
-                electric-pair-open-newline-between-pairs)
-              (eq last-command-event ?\{)
-              (= ?\{ (char-before)) (= ?\} (char-after)))
-        (newline nil t)))
+      (defun electric-pair-brace-fixup ()
+        (when (and electric-pair-mode
+                (if (functionp electric-pair-open-newline-between-pairs)
+                  (funcall electric-pair-open-newline-between-pairs)
+                  electric-pair-open-newline-between-pairs)
+                (eq last-command-event ?\{)
+                (= ?\{ (char-before)) (= ?\} (char-after)))
+          (newline nil t)))
 
-    (advice-add 'electric-pair-post-self-insert-function :after #'electric-pair-brace-fixup)
+      (advice-add 'electric-pair-post-self-insert-function :after #'electric-pair-brace-fixup)
     #+END_SRC
 
 ** C++
@@ -1333,21 +1363,26 @@ Repo: https://github.com/dbordak/telephone-line
 
     #+END_SRC
 
-*** TODO Swap between previous buffer
+*** TODO Swap between previous buffer - TODO
     Source: https://emacsredux.com/blog/2013/04/28/switch-to-previous-buffer/
 
-    TODO: Buffer List ruins this... Figure out a fix.
+#+BEGIN_SRC emacs-lisp
+      (setq last-buffer-name nil)
 
-    #+BEGIN_SRC emacs-lisp
-    (defun henry:switch-to-previous-buffer ()
-      "Switch to previously open buffer.
+      (defun henry:update-name-last-buffer ()
+  setq last-buffer-name (buffer-name))
 
-Repeated invocations toggle between the two most recently open buffers."
-      (interactive)
-      (switch-to-buffer (other-buffer (current-buffer) 1)))
-
-    (define-key <Leader> (kbd "s b") 'henry:switch-to-previous-buffer)
-    #+END_SRC
+      (defun henry:switch-to-previous-buffer ()
+          "Switch to previously open buffer.
+      Repeated invocations toggle between the two most recently open buffers."
+          (interactive)
+          (if (eq (buffer-name) "*Ibuffer*")
+            (message "OMG this worked!!!! FUCK YEAH!!!")
+            (message "nope...")))
+    (buffer-name)
+          ;(switch-to-buffer (other-buffer (current-buffer) 2)))
+      (define-key <Leader> (kbd "s b") 'henry:switch-to-previous-buffer)
+#+END_SRC
 
 *** Swap to *Scratch*
     #+BEGIN_SRC emacs-lisp
@@ -1591,11 +1626,11 @@ By default, 4 are assumed. Toggling enables/disables 2 spaces."
     TODO Check OS before trying to access settings file
 
     #+BEGIN_SRC emacs-lisp
-    ;; Think: Edit->Settings
-    (define-key <Leader> (kbd "e s") (lambda()
-      (interactive)
-      (message "Loading Emacs Settings.org file...")
-      (find-file "~/.emacs.d/settings.org")))
+      ;; Think: Edit->Settings
+      (define-key <Leader> (kbd "e s") (lambda()
+        (interactive)
+        (message "Loading Emacs Settings.org file...")
+        (find-file "~/.emacs.d/settings.org")))
     #+END_SRC
 
 *** File and folder management
@@ -1676,10 +1711,20 @@ horizontally, respectively."
         "Inserts PHP code to spit out all accessible vars. Also kills the rest of the script."
         (interactive)
         (evil-insert-state)
-        (insert "\n echo <pre>\n print_r(get_defined_vars());\n exit('DEBUG');\n")
+        (insert "\n echo '<pre>';\n print_r(get_defined_vars());\n exit('DEBUG');\n")
         (evil-normal-state))
 
       (define-key <Leader> (kbd "i v") 'henry:insert-get-defined-vars)
+    #+END_SRC
+
+*** Edit notes (shortcut)
+
+    #+BEGIN_SRC emacs-lisp
+      ;; Think: Edit->Notes
+      (define-key <Leader> (kbd "e n") (lambda()
+        (interactive)
+        (message "Loading Project Notes.")
+        (find-file "~/dev/ee/_hold-ontos_/_my-notes_.org")))
     #+END_SRC
 
 
